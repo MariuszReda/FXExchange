@@ -17,7 +17,8 @@ namespace FXExchange.Tests.Mock
             { new Currency("SEK"), 76.10m },
             { new Currency("NOK"), 78.40m },
             { new Currency("CHF"), 683.58m },
-            { new Currency("JPY"), 5.9740m }
+            { new Currency("JPY"), 5.9740m },
+            { new Currency("DKK"), 1 }
         };
 
         public static Dictionary<Currency, decimal> GetRatesCurrencies()

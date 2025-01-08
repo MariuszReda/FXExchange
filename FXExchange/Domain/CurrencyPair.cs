@@ -12,7 +12,7 @@ namespace FXExchange.Domain
         public Currency QuoteCurrency { get; }
         public decimal ExchangeRate { get; }
 
-        public CurrencyPair(Currency baseCurrency, Currency quoteCurrency, decimal exchangeRate)
+        public CurrencyPair(Currency baseCurrency, Currency quoteCurrency, decimal exchangeRate, List<Currency> availableCurrencies)
         {
             if (baseCurrency == null || quoteCurrency == null)
                 throw new ArgumentNullException("Currencies cannot be null.");
@@ -21,6 +21,12 @@ namespace FXExchange.Domain
 
             BaseCurrency = baseCurrency;
             QuoteCurrency = quoteCurrency;
+            ExchangeRate = exchangeRate;
+
+            BaseCurrency = Currency.GetCurrency(baseCurrency.IsoCode, availableCurrencies);
+
+            QuoteCurrency = Currency.GetCurrency(quoteCurrency.IsoCode, availableCurrencies);
+
             ExchangeRate = exchangeRate;
         }
     }
