@@ -33,19 +33,16 @@ namespace FXExchange.Infrastructure
 
         public decimal GetExchangeRate(Currency currency)
         {
-            // Pobranie hashCode z podanego obiektu Currency
             var hashCode = currency.GetHashCode();
 
-            // Przeszukanie słownika w celu dopasowania hashCode
             foreach (var pair in Rates)
             {
                 if (pair.Key.GetHashCode() == hashCode)
                 {
-                    return pair.Value; // Zwrócenie wartości odpowiadającej kluczowi
+                    return pair.Value; 
                 }
             }
 
-            // Jeśli nie znaleziono odpowiedniej wartości
             throw new KeyNotFoundException($"No exchange rate found for currency with hashCode {hashCode}.");
         }
     }

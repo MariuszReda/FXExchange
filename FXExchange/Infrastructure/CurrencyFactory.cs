@@ -20,7 +20,7 @@ namespace FXExchange.Infrastructure
         public Currency Create(string isoCode)
         {
             if (!_provider.IsValidIsoCode(isoCode))
-                throw new ArgumentException($"ISO code '{isoCode}' is not supported.");
+                throw new KeyNotFoundException($"Currency with ISO code '{isoCode}' not found.");
 
             return new Currency(isoCode);
         }
