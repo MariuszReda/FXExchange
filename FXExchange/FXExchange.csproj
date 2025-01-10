@@ -13,12 +13,8 @@
 
   <ItemGroup>
     <Content Include="Config\appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Presentation\" />
   </ItemGroup>
 
   <ItemGroup>

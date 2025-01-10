@@ -1,7 +1,5 @@
-using FXExchange.Application;
 using FXExchange.Domain;
 using FXExchange.Infrastructure;
-using System;
 
 namespace FXExchange.Tests
 {
@@ -13,7 +11,7 @@ namespace FXExchange.Tests
         [Fact]
         public void GetExchangeEURtoDKK_ShouldReturnConvertedAmount()
         {
-            decimal amountInEUR = 100m; // 100 EUR
+            decimal amountInEUR = 100m; 
             Currency sourceCurrency = factory.Create("DKK");          
             Currency targetCurrency = factory.Create("EUR");
 
@@ -56,7 +54,7 @@ namespace FXExchange.Tests
         [Fact]
         public void GetExchangeDKKtoEUR_ShouldReturnConvertedAmount()
         {
-            decimal amountInEUR = 100m; // 100 DKK
+            decimal amountInEUR = 100m;
             Currency sourceCurrency = factory.Create("EUR");
             Currency targetCurrency = factory.Create("DKK");
 
@@ -73,7 +71,7 @@ namespace FXExchange.Tests
         [Fact]
         public void GetExchangeGBPtoEUR_ShouldReturnConvertedAmount()
         {
-            decimal amountInEUR = 100m; // 100 GBP
+            decimal amountInEUR = 100m;
             Currency sourceCurrency = factory.Create("EUR");
             Currency targetCurrency = factory.Create("GBP");
 

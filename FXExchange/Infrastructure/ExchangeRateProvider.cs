@@ -1,11 +1,5 @@
 ﻿using FXExchange.Application.Interfaces;
 using FXExchange.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FXExchange.Infrastructure
 {
@@ -15,18 +9,41 @@ namespace FXExchange.Infrastructure
         private readonly HttpClient _httpClient;
         public ExchangeRateProvider(HttpClient httpClient)
         {
-            //if (_rates == null) 
-            //{
-            //    _rates =  FetchRatesFromApi();
-            //}
             _httpClient = httpClient;
         }
 
-
-
-        public Dictionary<string, decimal> GetRates()
+        public async Task InitializeAsync()
         {
-            throw new NotImplementedException();
+            if (_rates != null && _rates.Count > 0)
+            {
+                return;
+            }
+
+            _rates = new Dictionary<string, decimal>();
+
+            try
+            {
+                var response = await _httpClient.GetAsync("");
+                response.EnsureSuccessStatusCode();
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                using var jsonDocument = System.Text.Json.JsonDocument.Parse(jsonResponse);
+                var conversionRatesElement = jsonDocument.RootElement.GetProperty("conversion_rates");
+
+                foreach (var rate in conversionRatesElement.EnumerateObject())
+                {
+                    if (!_rates.ContainsKey(rate.Name))
+                    {
+                        _rates.Add(rate.Name, rate.Value.GetDecimal());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error initializing rates: {ex.Message}");
+                throw;
+            }
         }
 
         public bool IsValidIsoCode(string isoCode)
@@ -34,32 +51,18 @@ namespace FXExchange.Infrastructure
             return _rates.ContainsKey(isoCode);
         }
 
-        public  Dictionary<string, decimal> FetchRatesFromApi()
-        {
-            string Url = "";
-
-            try
-            {
-                var response = _httpClient.GetAsync(Url).Result;
-                response.EnsureSuccessStatusCode();
-
-                string jsonResponse = response.Content.ReadAsStringAsync().Result;
-
-                // string ratesSection = ExtractRatesSection(jsonResponse);
-
-                return  new Dictionary<string, decimal>();
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching rates from API: {ex.Message}");
-                return new Dictionary<string, decimal>();
-            }
-        }
 
         public decimal GetExchangeRate(Currency source, Currency target)
         {
-            throw new NotImplementedException();
+            if (source.GetHashCode() == target.GetHashCode())
+            {
+                return 1m;
+            }
+
+            decimal sourceToDKK = _rates[source.IsoCode];
+            decimal targetToDKK = _rates[target.IsoCode];
+
+            return targetToDKK / sourceToDKK;
         }
     }
 }
