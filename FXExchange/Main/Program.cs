@@ -1,34 +1,18 @@
 ﻿using FXExchange.Application.Interfaces;
+using FXExchange.Application.Serivces;
 using FXExchange.Config;
-using FXExchange.Domain;
 using FXExchange.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 
-if (args.Length != 2)
-{
-    Console.WriteLine("Usage: Exchange <currency pair> <amount to exchange>");
-    return;
-}
-
-string firstArg="";
-string secendArg="";
+string firstArg = string.Empty;
+string secendArg = string.Empty;
 decimal amountArg = 0;
 
-foreach (var arg in args)
-{
-    var pair = args[0].Split('/');
-    firstArg = pair[1];
-    secendArg = pair[0];
 
-    if (!decimal.TryParse(args[1], out amountArg))
-    {
-        Console.WriteLine("Invalid amount. Please provide a numeric value.");
-        return;
-    }
-}
+ValidateArguments(args, out firstArg, out secendArg, out amountArg);
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -43,7 +27,8 @@ var services = new ServiceCollection()
         httpClient.BaseAddress = new Uri($"https://v6.exchangerate-api.com/v6/{apiConfig.ApiKey}/latest/DKK");
         httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     })
-    .Services;
+    .Services
+    .AddSingleton<IExchangeService, ExchangeService>();
 
 bool useMockData = configuration.GetValue<bool>("UseMockData");
 
@@ -64,12 +49,43 @@ bool useMockData = configuration.GetValue<bool>("UseMockData");
 
 var serviceProvider = services.BuildServiceProvider();
 
+var exchangeService = serviceProvider.GetRequiredService<IExchangeService>();
+var result = exchangeService.PerformExchange(firstArg, secendArg, amountArg);
 
-var exchangeRateProvider = serviceProvider.GetRequiredService<IExchangeRateProvider>();
-CurrencyFactory factory = new CurrencyFactory(exchangeRateProvider);
-Currency sourceCurrency = factory.Create(firstArg);
-Currency targetCurrency = factory.Create(secendArg);
-decimal exchangeRate = exchangeRateProvider.GetExchangeRate(sourceCurrency, targetCurrency);
-CurrencyPair currencyPair = new CurrencyPair(sourceCurrency, targetCurrency, exchangeRate);
-var result = currencyPair.Convert(amountArg);
 Console.WriteLine(result);
+
+
+#region Methods
+
+static void ValidateArguments(string[] args, out string firstArg, out string secendArg, out decimal amountArg)
+{
+    if (args.Length != 2)
+    {
+        Console.WriteLine("Usage: Exchange <currency pair> <amount to exchange>");
+        Environment.Exit(1); 
+    }
+
+    if (!args[0].Contains('/'))
+    {
+        Console.WriteLine("Invalid currency pair format. Use format: <source>/<target> (e.g., EUR/DKK).");
+        Environment.Exit(1); 
+    }
+
+    var pair = args[0].Split('/');
+    if (pair.Length != 2)
+    {
+        Console.WriteLine("Invalid currency pair format. Use format: <source>/<target> (e.g., EUR/DKK).");
+        Environment.Exit(1);
+    }
+
+    firstArg = pair[1].ToUpper();
+    secendArg = pair[0].ToUpper();
+
+    if (!decimal.TryParse(args[1], out amountArg))
+    {
+        Console.WriteLine("Invalid amount. Please provide a numeric value.");
+        Environment.Exit(1);
+    }
+}
+
+#endregion

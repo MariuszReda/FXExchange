@@ -51,7 +51,6 @@ namespace FXExchange.Infrastructure
             return _rates.ContainsKey(isoCode);
         }
 
-
         public decimal GetExchangeRate(Currency source, Currency target)
         {
             if (source.GetHashCode() == target.GetHashCode())
@@ -59,8 +58,8 @@ namespace FXExchange.Infrastructure
                 return 1m;
             }
 
-            decimal sourceToDKK = _rates[source.IsoCode];
-            decimal targetToDKK = _rates[target.IsoCode];
+            decimal sourceToDKK = _rates[target.IsoCode];
+            decimal targetToDKK = _rates[source.IsoCode];
 
             return targetToDKK / sourceToDKK;
         }
