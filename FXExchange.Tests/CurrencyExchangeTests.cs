@@ -13,11 +13,11 @@ namespace FXExchange.Tests
         [Fact]
         public void GetExchangeEURtoDKK_ShouldReturnConvertedAmount()
         {
-            decimal amountInEUR = 100m; // 100 EURO
+            decimal amountInEUR = 100m; // 100 EUR
             Currency sourceCurrency = factory.Create("DKK");          
             Currency targetCurrency = factory.Create("EUR");
 
-            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(targetCurrency);
+            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(sourceCurrency, targetCurrency);
 
             CurrencyPair currencyPair = new CurrencyPair(sourceCurrency, targetCurrency, exchangeRate);
 
@@ -43,13 +43,47 @@ namespace FXExchange.Tests
         public void Convert_SameCurrency_ShouldReturnSameAmount()
         {
             Currency currency = factory.Create("EUR");
-            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(currency);
+            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(currency, currency);
 
             var currencyPair = new CurrencyPair(currency, currency, exchangeRate);
 
             var result = currencyPair.Convert(100);
 
             Assert.Equal(100m, result);
+        }
+
+
+        [Fact]
+        public void GetExchangeDKKtoEUR_ShouldReturnConvertedAmount()
+        {
+            decimal amountInEUR = 100m; // 100 DKK
+            Currency sourceCurrency = factory.Create("EUR");
+            Currency targetCurrency = factory.Create("DKK");
+
+            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(sourceCurrency, targetCurrency);
+
+            CurrencyPair currencyPair = new CurrencyPair(sourceCurrency, targetCurrency, exchangeRate);
+
+            var result = currencyPair.Convert(amountInEUR);
+
+            Assert.Equal(13.4419m, result);
+        }
+
+
+        [Fact]
+        public void GetExchangeGBPtoEUR_ShouldReturnConvertedAmount()
+        {
+            decimal amountInEUR = 100m; // 100 GBP
+            Currency sourceCurrency = factory.Create("EUR");
+            Currency targetCurrency = factory.Create("GBP");
+
+            decimal exchangeRate = mockExchangeRateProvider.GetExchangeRate(sourceCurrency, targetCurrency);
+
+            CurrencyPair currencyPair = new CurrencyPair(sourceCurrency, targetCurrency, exchangeRate);
+
+            var result = currencyPair.Convert(amountInEUR);
+
+            Assert.Equal(114.6396m, result);
         }
 
     }

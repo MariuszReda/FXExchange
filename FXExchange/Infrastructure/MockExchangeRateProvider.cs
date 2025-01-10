@@ -11,7 +11,7 @@ namespace FXExchange.Infrastructure
     public class MockExchangeRateProvider : IExchangeRateProvider
     {
 
-        private static readonly Dictionary<string, decimal> Rates = new()
+        private static readonly Dictionary<string, decimal> _rates = new()
         {
             { "EUR", 7.4394m },
             { "USD", 6.6311m },
@@ -24,27 +24,36 @@ namespace FXExchange.Infrastructure
         };
         public Dictionary<string, decimal> GetRates()
         {
-            return Rates;
+            return _rates;
         }
         public bool IsValidIsoCode(string isoCode)
         {
-            return Rates.ContainsKey(isoCode);
+            return _rates.ContainsKey(isoCode);
         }
 
-        public decimal GetExchangeRate(Currency currency)
+        public decimal GetExchangeRate(Currency source, Currency target)
         {
-            var hashCode = currency.GetHashCode();
-
-            foreach (var pair in Rates)
+            if (source == null || target == null)
             {
-                if (pair.Key.GetHashCode() == hashCode)
-                {
-                    return pair.Value; 
-                }
+                throw new ArgumentException("Waluty źródłowa i docelowa muszą być podane.");
             }
 
-            throw new KeyNotFoundException($"No exchange rate found for currency with hashCode {hashCode}.");
+            if (!_rates.ContainsKey(source.IsoCode) || !_rates.ContainsKey(target.IsoCode))
+            {
+                throw new ArgumentException("Nieznana waluta.");
+            }
+
+            if (source.GetHashCode() == target.GetHashCode())
+            {
+                return 1m;
+            }
+
+            decimal sourceToDKK = _rates[source.IsoCode];
+            decimal targetToDKK = _rates[target.IsoCode];
+
+            return targetToDKK / sourceToDKK;
         }
+
     }
-    
+
 }

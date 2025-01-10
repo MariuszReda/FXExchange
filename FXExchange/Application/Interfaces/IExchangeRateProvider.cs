@@ -11,6 +11,6 @@ namespace FXExchange.Application.Interfaces
     {
         Dictionary<string, decimal> GetRates();
         bool IsValidIsoCode(string isoCode);
-        decimal GetExchangeRate(Currency currency);
+        decimal GetExchangeRate(Currency source, Currency target);
     }
 }
